@@ -15,6 +15,7 @@ $(document).ready(function () {
 		sendPrivateMessage();
 	});
 
+// reset notifications(notification 숫자 클릭시 reset 됨)
 	$("#notifications").click(function () {
 		resetNotificationCount();
 	});
@@ -25,6 +26,8 @@ function connect() {
 	stompClient = Stomp.over(socket);
 	stompClient.connect({}, function (frame) {
 		console.log("Connected: " + frame);
+
+// notification 표시하기(notificationCount == 0이므로 hide 상태)
 		updateNotificationDisplay();
 
 // global messaging
@@ -37,15 +40,19 @@ function connect() {
 			showMessage(JSON.parse(message.body).content);
 		});
 
+// global message에 대한 notification 표시
+// notificationCount > 0 이므로 show 상태
 		stompClient.subscribe("/topic/global-notifications", function (message) {
-			notificationCount = notificationCount + 1;
+			notificationCount += 1;
 			updateNotificationDisplay();
 		});
 
+// private message에 대한 notification 표시
+// notificationCount > 0 이므로 show 상태
 		stompClient.subscribe(
 			"/user/topic/private-notifications",
 			function (message) {
-				notificationCount = notificationCount + 1;
+				notificationCount += 1;
 				updateNotificationDisplay();
 			}
 		);
@@ -76,6 +83,7 @@ function sendPrivateMessage() {
 	);
 }
 
+// Notification 표시하기
 function updateNotificationDisplay() {
 	if (notificationCount == 0) {
 		$("#notifications").hide();
@@ -85,6 +93,7 @@ function updateNotificationDisplay() {
 	}
 }
 
+// Notification 숫자 리셋하기
 function resetNotificationCount() {
 	notificationCount = 0;
 	updateNotificationDisplay();

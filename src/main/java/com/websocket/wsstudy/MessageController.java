@@ -2,6 +2,7 @@ package com.websocket.wsstudy;
 
 import com.websocket.wsstudy.dto.Message;
 import com.websocket.wsstudy.dto.ResponseMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SendToUser;
@@ -13,12 +14,15 @@ import java.security.Principal;
 @Controller
 public class MessageController {
 
+    @Autowired
+    private NotificationService notificationService;
+
     // Global messaging
     @MessageMapping("/message")
     @SendTo("/topic/messages")
     public ResponseMessage getMessage(final Message message) throws InterruptedException {
-
         Thread.sleep(1000);
+        notificationService.sendGlobalNotification();
         return new ResponseMessage(HtmlUtils.htmlEscape(message.getMessageContent()));
     }
 
@@ -29,6 +33,7 @@ public class MessageController {
                                              final Principal principal) throws InterruptedException {
 
         Thread.sleep(1000);
+        notificationService.sendPrivateNotification(principal.getName());
         return new ResponseMessage(HtmlUtils.htmlEscape(
                 "Sending private message to user " + principal.getName() + ": "
                         + message.getMessageContent())
