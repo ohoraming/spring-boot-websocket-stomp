@@ -5,10 +5,12 @@ $(document).ready(function () {
 	console.log("Index page is ready");
 	connect();
 
+//  send global message
 	$("#send").click(function () {
 		sendMessage();
 	});
 
+//  send private message
 	$("#send-private").click(function () {
 		sendPrivateMessage();
 	});
@@ -24,10 +26,13 @@ function connect() {
 	stompClient.connect({}, function (frame) {
 		console.log("Connected: " + frame);
 		updateNotificationDisplay();
+
+// global messaging
 		stompClient.subscribe("/topic/messages", function (message) {
 			showMessage(JSON.parse(message.body).content);
 		});
 
+// private messaging
 		stompClient.subscribe("/user/topic/private-messages", function (message) {
 			showMessage(JSON.parse(message.body).content);
 		});
@@ -51,6 +56,7 @@ function showMessage(message) {
 	$("#messages").append("<tr><td>" + message + "</td></tr>");
 }
 
+// global messaging
 function sendMessage() {
 	console.log("sending message");
 	stompClient.send(
@@ -60,6 +66,7 @@ function sendMessage() {
 	);
 }
 
+// private messaging
 function sendPrivateMessage() {
 	console.log("sending private message");
 	stompClient.send(
